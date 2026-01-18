@@ -7,19 +7,24 @@ chown -R mysql:mysql /var/lib/mysql /var/run/mysqld
 
 if [ ! -d "/var/lib/mysql/mysql" ]; then
     echo "First start: initializing database"
-
     # Initialize data directory
     mysql_install_db --user=mysql --datadir=/var/lib/mysql
+fi
 
-    # Start a temporary server to create users (Run as mysql user!)
-    mysqld --user=mysql --skip-networking &
-    pid="$!"
-    
-    # Wait for the temporary server to be ready
-    until mysqladmin ping >/dev/null 2>&1; do
-        sleep 1
-    done
+# Start a temporary server to create users (Run as mysql user!)
+mysqld --user=mysql --skip-networking &
+pid="$!"
 
+# Wait for the temporary server to be ready
+until mysqladmin ping >/dev/null 2>&1; do
+    sleep 1
+done
+
+# Check if wordpress database exists to determine if setup is needed
+DB_EXISTS=$(mysql -u root -e "SHOW DATABASES LIKE 'wordpress';" 2>/dev/null | grep wordpress)
+
+if [ -z "$DB_EXISTS" ]; then
+    echo "Setting up database and users..."
     # Create users and database
     mysql -u root <<EOF
 CREATE DATABASE IF NOT EXISTS wordpress;
@@ -28,13 +33,13 @@ GRANT ALL PRIVILEGES ON wordpress.* TO '${MYSQL_USER}'@'%';
 FLUSH PRIVILEGES;
 ALTER USER 'root'@'localhost' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
 EOF
-
-    # Stop the temporary server properly
-    kill "$pid"
-    wait "$pid"
 else
-    echo "Database already initialized"
+    echo "Database already configured"
 fi
+
+# Stop the temporary server properly
+kill "$pid"
+wait "$pid"
 
 # 2. THE MAIN FIX: Add '--user=mysql'
 # This tells MariaDB: "Even though Docker is root, run this process as the mysql user."

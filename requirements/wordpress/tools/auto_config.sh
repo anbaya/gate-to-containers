@@ -16,6 +16,10 @@ if [ ! -f "/var/www/html/wp-config.php" ]; then
         --dbhost="mariadb" \
         --path='/var/www/html'
 
+    # Add fix for Nginx SSL handling
+    # wp config set FORCE_SSL_ADMIN true --raw --allow-root --path='/var/www/html'
+    # wp config set $_SERVER['HTTPS'] 'on' --raw --allow-root --path='/var/www/html'
+
     # 3. Install (This creates the admin user and site title)
     wp core install \
         --allow-root \
