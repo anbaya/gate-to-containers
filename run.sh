@@ -1,0 +1,3 @@
+#!/bin/bash
+
+docker stop nginx wordpress mariadb && docker rmi 18ddafacae76 76c0d2b41032 f7dd15773a7c --force && docker container prune && docker build -t my-mariadb-image requirements/mariadb && docker build -t my-wordpress-image requirements/wordpress && docker build -t my-nginx-image requirements/nginx && docker run -itd --name mariadb --network inception_net -v mariadb_data:/var/lib/mysql --env-file requirements/.env my-mariadb-image && sleep 10 && docker run -itd --name wordpress --network inception_net -v wp_data:/var/www/html --env-file requirements/.env my-wordpress-image && docker run -itd --name nginx --network inception_net -p 3000:443 -v wp_data:/var/www/html my-nginx-image

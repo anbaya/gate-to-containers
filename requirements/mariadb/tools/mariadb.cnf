@@ -1,0 +1,14 @@
+[mysqld]
+# Allow connections from other containers (WordPress)
+bind-address = 0.0.0.0
+port = 3306
+
+# Data directory (must match Docker volume)
+datadir = /var/lib/mysql
+
+# Disable DNS lookup (faster & avoids container DNS issues)
+skip-name-resolve
+
+# Charset (important for WordPress)
+character-set-server = utf8mb4
+collation-server = utf8mb4_general_ci

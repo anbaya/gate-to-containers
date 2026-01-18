@@ -1,0 +1,37 @@
+#!/bin/bash
+cd /var/www/html
+
+if [ ! -f "/var/www/html/wp-config.php" ]; then
+    echo "WordPress not found. Installing..."
+    
+    # 1. Download (Ignore error if files exist)
+    wp core download --allow-root || true
+
+    # 2. Create Config (This fills the database form for you)
+    wp config create \
+        --allow-root \
+        --dbname="$MYSQL_DATABASE" \
+        --dbuser="$MYSQL_USER" \
+        --dbpass="$MYSQL_PASSWORD" \
+        --dbhost="mariadb" \
+        --path='/var/www/html'
+
+    # 3. Install (This creates the admin user and site title)
+    wp core install \
+        --allow-root \
+        --url="$DOMAIN_NAME" \
+        --title="$WP_TITLE" \
+        --admin_user="$WP_ADMIN_USER" \
+        --admin_password="$WP_ADMIN_PASSWORD" \
+        --admin_email="$WP_ADMIN_EMAIL"
+        
+    # 4. Create a second user (Required by subject)
+    wp user create \
+        --allow-root \
+        "$WP_USER" "$WP_EMAIL" \
+        --user_pass="$WP_PASSWORD" \
+        --role=author
+fi
+
+echo "Starting PHP..."
+exec /usr/sbin/php-fpm7.4 -F
