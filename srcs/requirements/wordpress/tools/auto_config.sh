@@ -54,6 +54,7 @@ if [ ! -f "/var/www/html/wp-config.php" ]; then
         --role=author
 fi
 
+chown -R www-data:www-data /var/www/html
 
 echo "Starting PHP..."
 exec /usr/sbin/php-fpm7.4 -F
