@@ -5,9 +5,10 @@ services:
     networks:
       - inception_net
     env_file:
-      - requirements/.env
+      - .env
     volumes:
       - mariadb_data:/var/lib/mysql
+    restart: always
   wordpress:
     build: ./requirements/wordpress/
     networks:
@@ -15,9 +16,10 @@ services:
     depends_on:
       - mariadb
     env_file:
-      - requirements/.env
+      - .env
     volumes:
       - wordpress_data:/var/www/html
+    restart: always
   nginx:
     build: ./requirements/nginx/
     networks:
@@ -28,13 +30,21 @@ services:
       - wordpress_data:/var/www/html
     depends_on:
       - wordpress
+    restart: always
 
 volumes:
   mariadb_data:
     driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/anbaya/data/mariadb
   wordpress_data:
     driver: local
-
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/anbaya/data/wordpress
 networks:
   inception_net:
     driver: bridge

@@ -1,6 +1,12 @@
 #!/bin/bash
 cd /var/www/html
 
+echo "Waiting for MariaDB..."
+while ! mariadb-admin ping -h"mariadb" --silent; do
+    sleep 1
+done
+echo "MariaDB is up!"
+
 if [ ! -f "/var/www/html/wp-config.php" ]; then
     echo "WordPress not found. Installing..."
     
@@ -21,6 +27,7 @@ if [ ! -f "/var/www/html/wp-config.php" ]; then
     # wp config set $_SERVER['HTTPS'] 'on' --raw --allow-root --path='/var/www/html'
 
     # 3. Install (This creates the admin user and site title)
+
     wp core install \
         --allow-root \
         --url="$DOMAIN_NAME" \
@@ -36,6 +43,7 @@ if [ ! -f "/var/www/html/wp-config.php" ]; then
         --user_pass="$WP_PASSWORD" \
         --role=author
 fi
+
 
 echo "Starting PHP..."
 exec /usr/sbin/php-fpm7.4 -F
