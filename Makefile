@@ -6,8 +6,6 @@ all:
 down:
 	@docker compose -f ./srcs/docker-compose.yml down
 
-re: fclean all
-
 clean:
 	@docker compose -f ./srcs/docker-compose.yml down -v
 	@docker system prune -af
@@ -15,5 +13,7 @@ clean:
 fclean: clean
 	@rm -rf /home/anbaya/data/mariadb
 	@rm -rf /home/anbaya/data/wordpress
+
+re: fclean all
 
 .PHONY: all down re clean fclean

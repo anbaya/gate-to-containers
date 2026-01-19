@@ -6,6 +6,12 @@ while ! mariadb-admin ping -h"mariadb" --silent; do
     sleep 1
 done
 echo "MariaDB is up!"
+echo "Waiting for Redis..."
+while [ "$(redis-cli -h redis ping)" != "PONG" ]; do
+  sleep 1
+done
+
+echo "Redis is up and running!"
 
 if [ ! -f "/var/www/html/wp-config.php" ]; then
     echo "WordPress not found. Installing..."
@@ -26,8 +32,12 @@ if [ ! -f "/var/www/html/wp-config.php" ]; then
     # wp config set FORCE_SSL_ADMIN true --raw --allow-root --path='/var/www/html'
     # wp config set $_SERVER['HTTPS'] 'on' --raw --allow-root --path='/var/www/html'
 
-    # 3. Install (This creates the admin user and site title)
+    # 2. Add Redis Settings (The Bonus Part)
+    wp config set WP_REDIS_HOST redis --allow-root --path='/var/www/html'
+    wp config set WP_REDIS_PORT 6379 --raw --allow-root --path='/var/www/html'
+    wp config set WP_CACHE true --raw --allow-root --path='/var/www/html'
 
+    # 3. Install (This creates the admin user and site title)
     wp core install \
         --allow-root \
         --url="$DOMAIN_NAME" \

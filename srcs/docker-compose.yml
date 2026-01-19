@@ -2,6 +2,7 @@
 services:
   mariadb:
     build: ./requirements/mariadb/
+    container_name: mariadb
     networks:
       - inception_net
     env_file:
@@ -9,12 +10,20 @@ services:
     volumes:
       - mariadb_data:/var/lib/mysql
     restart: always
+  redis:
+    build: ./requirements/bonus/redis/
+    container_name: redis
+    networks:
+      - inception_net
+    restart: always
   wordpress:
     build: ./requirements/wordpress/
+    container_name: wordpress
     networks:
       - inception_net
     depends_on:
       - mariadb
+      - redis
     env_file:
       - .env
     volumes:
@@ -22,6 +31,7 @@ services:
     restart: always
   nginx:
     build: ./requirements/nginx/
+    container_name: nginx
     networks:
       - inception_net
     ports:
