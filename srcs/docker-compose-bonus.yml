@@ -68,6 +68,17 @@ services:
     ports:
       - "8080:8080"
     restart: always
+  portainer:
+    build: ./requirements/bonus/portainer/
+    container_name: portainer
+    networks:
+      - inception_net
+    ports:
+      - "9000:9000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+    restart: always
 
 volumes:
   mariadb_data:
@@ -82,6 +93,8 @@ volumes:
       type: none
       o: bind
       device: /home/anbaya/data/wordpress
+  portainer_data:
+    driver: local
 networks:
   inception_net:
     driver: bridge
