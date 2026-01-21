@@ -5,8 +5,10 @@ FROM debian:bullseye
 RUN apt-get update && apt-get install -y \
     php7.4-fpm \
     php7.4-mysql \
+    php7.4-redis \
     wget \
     mariadb-client \
+    redis-tools \
     && rm -rf /var/lib/apt/lists/*
 
 # Fix the config path
@@ -19,7 +21,6 @@ RUN wget https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.ph
     mv wp-cli.phar /usr/local/bin/wp
 
 COPY tools/auto_config.sh /usr/local/bin/
-
 RUN chmod +x /usr/local/bin/auto_config.sh
 
 WORKDIR /var/www/html

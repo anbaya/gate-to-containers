@@ -10,13 +10,20 @@ services:
     volumes:
       - mariadb_data:/var/lib/mysql
     restart: always
+  redis:
+    build: ./requirements/bonus/redis/
+    container_name: redis
+    networks:
+      - inception_net
+    restart: always
   wordpress:
-    build: ./requirements/wordpress/
+    build: ./requirements/bonus/wordpress/
     container_name: wordpress
     networks:
       - inception_net
     depends_on:
       - mariadb
+      - redis
     env_file:
       - .env
     volumes:
@@ -33,6 +40,33 @@ services:
       - wordpress_data:/var/www/html
     depends_on:
       - wordpress
+    restart: always
+  vsftpd:
+    build: ./requirements/bonus/vsftpd/
+    container_name: vsftpd
+    networks:
+      - inception_net
+    ports:
+      - "3021:21"
+      - "21000-21010:21000-21010"
+    volumes:
+      - wordpress_data:/home/vsftpd
+    depends_on:
+      - wordpress
+    restart: always
+  thursday:
+    build: ./requirements/bonus/thursday/
+    container_name: thursday
+    ports:
+      - "3000:80"
+    restart: always
+  adminer:
+    build: ./requirements/bonus/adminer/
+    container_name: adminer
+    networks:
+    - inception_net
+    ports:
+      - "8080:8080"
     restart: always
 
 volumes:
