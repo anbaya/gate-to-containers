@@ -14,12 +14,14 @@ clean:
 fclean: clean
 	@rm -rf /home/anbaya/data/mariadb
 	@rm -rf /home/anbaya/data/wordpress
+	@rm -rf /home/anbaya/data/portainer
 
 re: fclean all
 
 bonus: 
 	@mkdir -p /home/anbaya/data/mariadb
 	@mkdir -p /home/anbaya/data/wordpress
+	@mkdir -p /home/anbaya/data/portainer
 	@docker compose -f ./srcs/docker-compose-bonus.yml up -d --build
 
 .PHONY: all down re clean fclean
